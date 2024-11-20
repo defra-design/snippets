@@ -1,9 +1,13 @@
-This is perhaps a slightly more advanced method for populating your prototypes but is super valuable and time-saving if you can use it. This is one of the more helpful but undocumented features of the GDS kit that can be incredibly powerful. Of course all the sample HTML is just for reference.
 
-Folder Structure
+# Advanced Method for Populating Prototypes
 
-Ensure your project structure follows the GDS Prototype Kit standards
+This is perhaps a slightly more advanced method for populating your prototypes but is super valuable and time-saving if you can use it. This is one of the more helpful but undocumented features of the GDS kit that can be incredibly powerful. Of course, all the sample HTML is just for reference.
 
+## Folder Structure
+
+Ensure your project structure follows the GDS Prototype Kit standards:
+
+```
 your-project/
 │
 ├── app/
@@ -16,13 +20,15 @@ your-project/
 │   └── routes.js                # Routes configuration
 │
 └── package.json
+```
 
-Step 1: Create the data.json File
+## Step 1: Create the `data.json` File
 
-Place the JSON data in the app/data/ folder. This file contains the service data that will be accessed by the Nunjucks templates. It’s probably worth validating your JSON using a validator tool to check for any errors before you start.
+Place the JSON data in the `app/data/` folder. This file contains the service data that will be accessed by the Nunjucks templates. It’s probably worth validating your JSON using a validator tool to check for any errors before you start.
 
-Example app/data/data.json:
+Example `app/data/data.json`:
 
+```json
 [
   {
 	"useCase": "Land Use Change Monitoring",
@@ -43,13 +49,15 @@ Example app/data/data.json:
 	]
   }
 ]
+```
 
-Step 2: Configure routes.js
+## Step 2: Configure `routes.js`
 
-We’ll load the JSON data in routes.js and pass it to the templates globally so that it can be accessed from any page. Update your routes file to pull in the JSON and handle the routing.
+We’ll load the JSON data in `routes.js` and pass it to the templates globally so that it can be accessed from any page. Update your routes file to pull in the JSON and handle the routing.
 
-Example app/routes.js:
+Example `app/routes.js`:
 
+```js
 const serviceData = require('./data/data.json');
 
 // Middleware to make serviceData available globally in all templates
@@ -70,23 +78,22 @@ router.get('/service-detail', function (req, res) {
 });
 
 module.exports = router;
+```
 
-Explanation
+### Explanation:
 
-Loading data.json: We load the data.json file using require() and store it in serviceData.
+- **Loading `data.json`**: We load the `data.json` file using `require()` and store it in `serviceData`.
+- **Middleware**: The middleware function makes `serviceData` available globally via `res.locals.serviceData`, allowing it to be accessed in any Nunjucks template.
+- **`/services` Route**: Renders the `services.html` template, which directly accesses `serviceData` to display the list of services.
+- **`/service-detail` Route**: Renders the `service-detail.html` template and passes the selected `serviceId` from the query string, which the template uses to display the corresponding service.
 
-Middleware The middleware function makes serviceData available globally via res.locals.serviceData, allowing it to be accessed in any Nunjucks template.
+## Step 3: Create the `services.html` Template
 
-/services Route: Renders the services.html template, which directly accesses serviceData to display the list of services.
+This page lists all services by accessing `serviceData` directly in the template from your JSON.
 
-/service-detail Route: Renders the service-detail.html template and passes the selected serviceId from the query string, which the template uses to display the corresponding service.
+Example `app/views/services.html`:
 
-Step 3: Create a services.html Template
-
-This page lists all services by accessing serviceData directly in the template from your JSON.
-
-Example app/views/services.html
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -151,21 +158,21 @@ function filterServices() {
 
 </body>
 </html>
+```
 
-Explanation
+### Explanation:
 
-Search Box: The user can type in the search box, and the filterServices() function filters the services in real-time.
+- **Search Box**: The user can type in the search box, and the `filterServices()` function filters the services in real-time.
+- **Rendering Services**: We loop through `serviceData` using `{% for service in serviceData %}`, rendering each service's title (`useCase`) and description.
+- **Service Details Link**: The service ID (from `loop.index0`) is passed as a query parameter to the service detail page.
 
-Rendering Services: We loop through serviceData using {% for service in serviceData %}, rendering each service's title (useCase) and description.
+## Step 4: Create the `service-detail.html` Template
 
-Service Details Link: The service ID (from loop.index0) is passed as a query parameter to the service detail page.
+This page shows detailed information about a specific service based on the `serviceId` passed from the query string.
 
-Step 4: Create the service-detail.html Template
+Example `app/views/service-detail.html`:
 
-This page shows detailed information about a specific service based on the serviceId passed from the query string.
-
-Example app/views/service-detail.html:
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -210,9 +217,9 @@ Example app/views/service-detail.html:
 
 </body>
 </html>
+```
 
-Explanation:
+### Explanation:
 
-Accessing Data with serviceId: The specific service is accessed from serviceData using the serviceId passed from the query string.
-
-Rendering Details: All details of the selected service (useCase, description, userGroup, inputArtefact, etc.) are displayed on the page.
+- **Accessing Data with `serviceId`**: The specific service is accessed from `serviceData` using the `serviceId` passed from the query string.
+- **Rendering Details**: All details of the selected service (`useCase`, `description`, `userGroup`, `inputArtefact`, etc.) are displayed on the page.
